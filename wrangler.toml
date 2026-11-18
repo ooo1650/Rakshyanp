@@ -1,5 +1,16 @@
-# Cloudflare Pages project config. Cloudflare's Git integration reads this on every build.
-# `name` must match the Pages project name in the dashboard; output is the Vite build folder.
+# Cloudflare Worker that serves the built site as static assets (no server code).
+# Cloudflare's Git integration (Workers Builds) runs `npm run build`, then `npx wrangler deploy`,
+# which uploads ./dist. `name` must match the Worker name in the dashboard.
 name = "rakshya"
 compatibility_date = "2025-06-01"
-pages_build_output_dir = "dist"
+
+# Public URL: https://rakshya.<your-subdomain>.workers.dev (add a custom domain in the dashboard).
+workers_dev = true
+# No per-version preview URLs: only the production deployment is reachable.
+preview_urls = false
+
+[assets]
+directory = "./dist"
+# React Router handles /community, /products etc.: unknown paths serve index.html.
+not_found_handling = "single-page-application"
+# public/_headers and public/_redirects (copied into dist/) are applied automatically.

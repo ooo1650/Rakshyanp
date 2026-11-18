@@ -2,6 +2,5 @@
 /community.html  /community  301
 /products.html   /products   301
 
-# Unknown paths fall back to index.html automatically on Cloudflare Pages
-# (SPA mode, because the build has no top-level 404.html), so React Router
-# handles /community and /products. No catch-all rule is needed here.
+# Other unknown paths fall back to index.html via not_found_handling =
+# "single-page-application" in wrangler.toml, so React Router handles them.

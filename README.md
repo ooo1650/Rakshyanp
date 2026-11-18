@@ -53,26 +53,26 @@ npm run build      # production build in dist/
 npm run preview    # serve dist/ locally
 ```
 
-## Deploying to Cloudflare Pages
+## Deploying to Cloudflare
 
-Deployed with Cloudflare's **Git integration**: Cloudflare builds and publishes the site on every push to `main`.
+Hosted as a **Cloudflare Worker with static assets**, connected to this GitHub repo through the dashboard (Workers Builds). On every push to `main`, Cloudflare runs `npm run build` and then `npx wrangler deploy`, which uploads `dist/` as configured in [`wrangler.toml`](wrangler.toml):
 
-### One-time setup (dashboard)
+- `[assets] directory = "./dist"`: the built site, no server code.
+- `not_found_handling = "single-page-application"`: unknown paths serve `index.html`, so React Router handles `/community`, `/products` and deep links like `/community#helplines`.
+- `workers_dev = true`: the site is reachable at `https://rakshya.<subdomain>.workers.dev`.
+- `preview_urls = false`: no per-version preview URLs.
+- `public/_headers` (security and cache headers) and `public/_redirects` (old `.html` URLs) are applied automatically.
 
-1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git**, then pick the `Rakshyanp` repository.
-2. Project name: **`rakshya`**. It must match `name` in `wrangler.toml`, which Cloudflare reads for the output folder.
-3. Build settings:
-   - Production branch: `main`
-   - Framework preset: **React (Vite)** (or None)
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-   - Node version: taken from `.node-version` (22), so no environment variable is needed.
-4. **Save and Deploy.** The site appears at `https://rakshya.pages.dev`. Add your own domain under the project's **Custom domains** tab.
-5. **Turn off preview builds** to save build quota: project → **Settings → Builds → Branch control** → set **Preview branch** to **None**. Only pushes to `main` will build.
+### Dashboard settings (Worker `rakshya` → Settings → Build)
 
-After that, every `git push` to `main` deploys automatically. Each build counts against the account's monthly build quota.
+- Git repository: `Rakshyanp`, branch `main`
+- Build command: `npm run build`
+- Deploy command: `npx wrangler deploy`
+- **Non-production branch builds: off**, so only pushes to `main` build. This saves build quota.
 
-Routing: Cloudflare Pages serves `index.html` for unknown paths (SPA mode, since there is no `404.html`), so deep links like `/community#helplines` work. `public/_redirects` sends the old `.html` URLs to the new routes, and `public/_headers` adds the security and caching headers.
+The Worker name in the dashboard must match `name` in `wrangler.toml`. Add your own domain under the Worker's **Settings → Domains & Routes**.
+
+To test the production setup locally: `npm run build && npx wrangler dev`.
 
 ## Performance & accessibility
 
