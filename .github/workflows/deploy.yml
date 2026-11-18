@@ -1,0 +1,56 @@
+# Build on GitHub, upload the finished site to Cloudflare Pages (Direct Upload).
+# Cloudflare never builds this project, so it uses none of the account's build quota.
+#
+# - push to master        -> build + deploy to production
+# - pull request          -> build only (catches broken builds), no deployment, no preview
+# - any other branch      -> nothing runs
+# - manual "Run workflow" -> build + deploy the chosen branch (master = production)
+#
+# Needs two repository (or organisation) secrets:
+#   CLOUDFLARE_API_TOKEN   token with "Account → Cloudflare Pages → Edit"
+#   CLOUDFLARE_ACCOUNT_ID  from the Cloudflare dashboard URL / Workers & Pages overview
+# The Pages project name comes from `name` in wrangler.toml.
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [master]
+    paths-ignore: ["**.md"]
+  pull_request:
+    branches: [master]
+    paths-ignore: ["**.md"]
+  workflow_dispatch:
+
+# One deploy at a time; a newer push cancels an older run that is still building.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        if: github.event_name != 'pull_request'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4"
+          # Reads name + pages_build_output_dir (dist) from wrangler.toml.
+          # --branch=master deploys to production; another branch name would create a preview.
+          command: pages deploy --branch=${{ github.ref_name }} --commit-hash=${{ github.sha }}

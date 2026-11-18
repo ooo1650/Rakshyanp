@@ -1,0 +1,7 @@
+# Old static-site URLs -> new routes (keeps shared links and bookmarks working)
+/community.html  /community  301
+/products.html   /products   301
+
+# Unknown paths fall back to index.html automatically on Cloudflare Pages
+# (SPA mode, because the build has no top-level 404.html), so React Router
+# handles /community and /products. No catch-all rule is needed here.

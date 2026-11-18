@@ -1,0 +1,22 @@
+{
+  "name": "rakshya",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Rakshya — protecting and supporting women and children in Nepal",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && npx wrangler@4 pages deploy --branch=master"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "^7.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.3.0",
+    "vite": "^8.3.8"
+  }
+}
