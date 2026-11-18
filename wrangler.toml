@@ -1,8 +1,5 @@
-# Cloudflare Pages project config (Direct Upload — Cloudflare does not build this repo).
-# GitHub Actions builds the site and runs `wrangler pages deploy`, which reads this file:
-#   name                    -> the Pages project to upload to (unique per app in the account)
-#   pages_build_output_dir  -> the folder that gets uploaded
-# See .github/workflows/deploy.yml and the README "Deploying" section.
+# Cloudflare Pages project config. Cloudflare's Git integration reads this on every build.
+# `name` must match the Pages project name in the dashboard; output is the Vite build folder.
 name = "rakshya"
 compatibility_date = "2025-06-01"
 pages_build_output_dir = "dist"

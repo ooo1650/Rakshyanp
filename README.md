@@ -55,36 +55,24 @@ npm run preview    # serve dist/ locally
 
 ## Deploying to Cloudflare Pages
 
-The site is built by **GitHub Actions** and uploaded with `wrangler pages deploy` (a Cloudflare *Direct Upload* project). Cloudflare never builds it, so it uses none of the account's build quota, which matters when several apps share one Cloudflare account.
+Deployed with Cloudflare's **Git integration**: Cloudflare builds and publishes the site on every push to `main`.
 
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml):
+### One-time setup (dashboard)
 
-| Event | What happens |
-| --- | --- |
-| Push to `master` | Build, then deploy to production |
-| Pull request into `master` | Build only, to catch a broken build. No deployment, no preview |
-| Push to any other branch | Nothing |
-| Actions → Run workflow | Build and deploy the chosen branch (`master` = production) |
+1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git**, then pick the `Rakshyanp` repository.
+2. Project name: **`rakshya`**. It must match `name` in `wrangler.toml`, which Cloudflare reads for the output folder.
+3. Build settings:
+   - Production branch: `main`
+   - Framework preset: **React (Vite)** (or None)
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Node version: taken from `.node-version` (22), so no environment variable is needed.
+4. **Save and Deploy.** The site appears at `https://rakshya.pages.dev`. Add your own domain under the project's **Custom domains** tab.
+5. **Turn off preview builds** to save build quota: project → **Settings → Builds → Branch control** → set **Preview branch** to **None**. Only pushes to `main` will build.
 
-Changes to Markdown files alone don't trigger a run.
+After that, every `git push` to `main` deploys automatically. Each build counts against the account's monthly build quota.
 
-### One-time setup
-
-1. **Create the Pages project as Direct Upload.** Don't connect the repo in the Cloudflare dashboard: a Git-connected project builds on Cloudflare, and a project can't be switched later.
-   ```bash
-   npx wrangler login
-   npx wrangler pages project create rakshya --production-branch=master
-   ```
-   The name must match `name` in `wrangler.toml`. Give each app in the account its own name.
-2. **Create an API token.** Cloudflare dashboard → My Profile → API Tokens → Create Token → Custom, with permission **Account → Cloudflare Pages → Edit**, limited to this account. One token can serve every app in the account.
-3. **Add GitHub secrets** (repo → Settings → Secrets and variables → Actions): `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` (shown on the Workers & Pages overview). With several app repos in a GitHub organisation, set them once as organisation secrets.
-4. Push to `master`. The site appears at `https://rakshya.pages.dev`. Add a custom domain under the project's Custom domains tab.
-
-For other projects in the same account that *are* Git-connected, turn off unneeded preview builds: project → Settings → Builds → Branch control → Preview branch: **None** (or only the branches you name).
-
-**Manual deploy from your machine:** `npm run deploy` (builds, then uploads `dist/` to production).
-
-Routing: Cloudflare Pages serves `index.html` for unknown paths (SPA mode, since there is no `404.html`), so deep links like `/community#helplines` work. `public/_redirects` sends the old `.html` URLs to the new routes.
+Routing: Cloudflare Pages serves `index.html` for unknown paths (SPA mode, since there is no `404.html`), so deep links like `/community#helplines` work. `public/_redirects` sends the old `.html` URLs to the new routes, and `public/_headers` adds the security and caching headers.
 
 ## Performance & accessibility
 
