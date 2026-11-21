@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import Hero, { HeroKicker, HeroTitle } from "../components/Hero";
 import Icon from "../components/Icon";
+import HeroSlides, { useMediaQuery } from "../components/HeroSlides";
 import { usePageMeta, useScrollProgress } from "../hooks/motion";
 import { rich, useLang } from "../i18n";
 
@@ -21,15 +22,17 @@ export default function About() {
   usePageMeta(a.metaTitle, a.metaDesc);
   const storyRef = useRef(null);
   useScrollProgress(storyRef);
+  const desktop = useMediaQuery("(min-width: 1100px)");
 
   return (
     <>
-      <Hero scrollCue>
+      {/* The photo slideshow is desktop-only: on phones it isn't rendered, so its images never download */}
+      <Hero scrollCue={!desktop} aside={desktop ? <HeroSlides /> : null}>
         <HeroKicker label="रक्षा">{a.kicker}</HeroKicker>
         <HeroTitle lines={a.heroLines} />
         <p className="lead">{a.heroLead}</p>
         <div className="btn-row">
-          <Link className="btn" to="/community">{a.join} <Icon name="arrowRight" strokeWidth={2.2} /></Link>
+          <Link className="btn" to="/community#helplines">{a.findSupport} <Icon name="arrowRight" strokeWidth={2.2} /></Link>
           <a className="btn btn--ghost" href="#story">{a.readStory}</a>
         </div>
         <div className="hero__stats">

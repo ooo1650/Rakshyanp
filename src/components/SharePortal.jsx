@@ -10,22 +10,9 @@ const MIN = 40, MAX = 3000, LAST = 4;
 const PII = /(\b\d{7,}\b)|([\w.+-]+@[\w-]+\.[\w.]+)|(\b98\d{8}\b)/;
 const EMPTY = { topic: "", story: "", region: "", consentModeration: false, consentAnon: false, wantSupport: false };
 
-function refCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  const buf = new Uint32Array(8);
-  crypto.getRandomValues(buf);
-  let out = "RK-";
-  for (let i = 0; i < 8; i++) { out += chars[buf[i] % chars.length]; if (i === 3) out += "-"; }
-  return out;
-}
-
-// Placeholder: nothing is stored or sent in this build. Replace with
-// fetch("/api/submissions", { method: "POST", body: JSON.stringify(payload) }).
-// The endpoint must not log IP addresses or set identifying cookies.
-function submitToModeration(payload) {
-  void payload;
-  return new Promise((resolve) => setTimeout(resolve, 900));
-}
+// PREVIEW ONLY: the form is a demo and nothing is sent or stored. The copy says so (share.sub,
+// share.s5Hint). To go live, POST the entry from onSubmit to a moderation endpoint that does not log
+// IP addresses or set identifying cookies, then restore a real confirmation message.
 
 export default function SharePortal() {
   const { open, openDrawer, closeDrawer } = useDrawers();
@@ -34,8 +21,6 @@ export default function SharePortal() {
   const [step, setStep] = useState(0);
   const [data, setData] = useState(EMPTY);
   const [errors, setErrors] = useState({});
-  const [sending, setSending] = useState(false);
-  const [code, setCode] = useState("");
   const headings = useRef([]);
   const storyRef = useRef(null);
   const moved = useRef(false);
@@ -75,13 +60,9 @@ export default function SharePortal() {
   const next = () => { if (validate()) go(Math.min(step + 1, LAST)); };
   const back = () => go(Math.max(step - 1, 0));
 
-  async function onSubmit(e) {
+  function onSubmit(e) {
     e.preventDefault();
-    setSending(true);
-    await submitToModeration({ topic: data.topic, region: data.region || null, story: data.story.trim(), wantsSupport: data.wantSupport });
-    setCode(refCode());
-    setData(EMPTY);
-    setSending(false);
+    setData(EMPTY); // discard what was typed: nothing leaves the browser
     go(LAST);
   }
 
@@ -172,7 +153,7 @@ export default function SharePortal() {
             </dl>
             <div className="step__nav">
               <button className="btn btn--ghost" type="button" onClick={back}>{s.edit}</button>
-              <button className="btn" type="submit" disabled={sending}>{sending ? s.sending : s.submit}</button>
+              <button className="btn" type="submit">{s.submit}</button>
             </div>
           </section>
 
@@ -180,8 +161,6 @@ export default function SharePortal() {
             <div className="success__mark"><Icon name="check" strokeWidth={2.5} /></div>
             {h3(4, "s5-title", s.s5Title)}
             <p className="step__hint">{s.s5Hint}</p>
-            <p>{s.refLabel} <br /><span className="ref-code">{code}</span></p>
-            <p className="small-print">{s.refNote}</p>
             <div className="btn-row" style={{ justifyContent: "center", marginTop: "1.25rem" }}>
               <button className="btn" type="button" onClick={(e) => openDrawer("emergency", e.currentTarget)}>{s.seeSupport}</button>
               <button className="btn btn--ghost" type="button" onClick={closeDrawer}>{t.common.close}</button>
