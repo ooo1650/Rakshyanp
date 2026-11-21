@@ -1,5 +1,7 @@
 import Hero, { HeroKicker, HeroTitle } from "../components/Hero";
 import Icon from "../components/Icon";
+import ProductVariants from "../components/ProductVariants";
+import ProductGuide from "../components/ProductGuide";
 import { usePageMeta } from "../hooks/motion";
 import { rich, useLang } from "../i18n";
 
@@ -90,6 +92,9 @@ export default function Products() {
           </div>
         </div>
       </section>
+
+      <ProductVariants />
+      <ProductGuide />
 
       <section className="section section--wash-rev" id="contact" aria-labelledby="contact-title">
         <div className="container">
