@@ -290,6 +290,17 @@ const en = {
         { tag: "Wristband", name: "SOS Band Lite", text: "For teens: SOS plus safe-arrival check-ins for parents." },
       ],
     },
+    scenarios: {
+      eyebrow: "Real-world moments",
+      title: "Built for the moments that matter.",
+      lead: "The situations the planned tools are being designed for. They are not on sale yet.",
+      items: [
+        ["Crowded micro-bus", "Someone won’t stop touching you. A pulled pin makes the whole bus look — the harasser loses their cover."],
+        ["Walking home after dark", "You sense you’re being followed. Triple-press the band and your sister sees exactly where you are."],
+        ["The school gate", "A stranger offers your child a ride. Rakshya Junior gives them a loud, simple way to say “no” and get adults’ attention."],
+        ["Trekking & travel", "Far from town with weak signal, the band queues your SOS and sends it the moment a connection returns."],
+      ],
+    },
     guide: {
       eyebrow: "Visual safety guide",
       title: "How it works, *step by step*",
